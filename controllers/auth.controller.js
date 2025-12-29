@@ -28,7 +28,17 @@ export const registerUser = async(req, res) => {
             }
         });
 
-        await sendEmail(email, "Verification Code", `Your verification otp is ${otpCode}`)
+        // await sendEmail(email, "Verification Code", `Your verification otp is ${otpCode}`)
+
+        try {
+            await sendEmail(
+                email,
+                "Verification Code",
+                `Your verification otp is <b>${otpCode}</b>`
+            );
+        } catch (err) {
+            console.log("Email failed but user registered");
+        }
 
         return res.status(201).json({ message: "Registered successfully. Please verify your otp" });
 
