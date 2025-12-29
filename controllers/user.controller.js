@@ -1,3 +1,5 @@
+import { Bus } from "../models/Bus.model.js";
+import { Train } from "../models/Train.model.js";
 import { usersModel } from "../models/User.model.js";
 import { findInMongoWithSelectQuery, updateRecordInMongoWithId } from "../repository/mongoCRUD.js";
 import bcrypt from "bcryptjs";
@@ -80,7 +82,7 @@ export const searchBus = async(req,res) => {
             }
         ];
 
-        const aggregationResult = await model.aggregate(pipeline);
+        const aggregationResult = await Bus.aggregate(pipeline);
 
         const data = aggregationResult[0];
         const total = data?.totalCount?.length > 0 ? data?.totalCount[0]?.total : 0;
@@ -160,7 +162,7 @@ export const searchTrain = async(req,res) => {
             }
         ];
 
-        const aggregationResult = await model.aggregate(pipeline);
+        const aggregationResult = await Train.aggregate(pipeline);
 
         const data = aggregationResult[0];
         const total = data?.totalCount?.length > 0 ? data?.totalCount[0]?.total : 0;
