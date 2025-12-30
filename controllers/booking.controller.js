@@ -6,7 +6,7 @@ import { ObjectId } from "mongodb";
 
 export const getBookings = async(req,res) =>{
     try {
-        const bookings = await findManyInMongo(Booking, { user: req.userId })
+        const bookings = await findManyInMongo(Booking, { user: new ObjectId(req.userId) })
 
         return res.status(200).json({ message: "Bookings fetched successfully", bookings });
 
