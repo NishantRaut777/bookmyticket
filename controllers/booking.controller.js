@@ -2,6 +2,7 @@ import { Booking } from "../models/Booking.model.js";
 import { Bus } from "../models/Bus.model.js";
 import { Train } from "../models/Train.model.js";
 import { deleteInMongo, findInMongo, findManyInMongo, updateRecordInMongo } from "../repository/mongoCRUD.js";
+import { ObjectId } from "mongodb";
 
 export const getBookings = async(req,res) =>{
     try {
@@ -136,6 +137,12 @@ export const deleteBooking = async(req,res) => {
     try {
         const booking = await findInMongo(Booking, { _id: new ObjectId(req.params.id) });
 
+        const bookingUserId = booking?.user.toString()
+
+        if(req.userId != bookingUserId){
+            return res.status(400).json({ message: `You can only delete your own bookings!` })
+        }
+
         if(!booking){
             return res.status(400).json({ message: `Booking not found` })
         }
@@ -148,8 +155,22 @@ export const deleteBooking = async(req,res) => {
             model1 = Bus
         }
 
-        await updateRecordInMongo(model1, { _id: booking?.vehicle }, { $inc: { availableSeats: booking?.seatsBooked } })
+        // make isBooked false for booked seats
+        const updateResult = await model1.updateOne(
+            {_id:  booking?.vehicle},
+            {
+                $set: { "seats.$[elem].isBooked": false }
+            },
+            {
+                arrayFilters: [ { "elem.seatNumber": { $in: booking?.seatNumbers } } ]
+            }
+        )
 
+        if (updateResult.matchedCount === 0) {
+            return res.status(400).json({ message: `Vehicle not found for delete` })
+        }
+
+        // delete record
         await deleteInMongo(Booking, { _id: new ObjectId(req.params.id) })
 
         return res.status(200).json({ message: "Booking deleted successfully"})
