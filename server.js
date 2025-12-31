@@ -7,6 +7,7 @@ import { connectDB } from "./lib/connectDB.js";
 import { adminRoutes } from "./routes/admin.route.js";
 import { userRoutes } from "./routes/user.route.js";
 import { bookingRoutes } from "./routes/booking.route.js";
+import { generalLimiter } from "./lib/helper.js";
 
 const app = express();
 
@@ -25,9 +26,9 @@ dotenv.config();
 connectDB()
 
 app.use("/api/auth", authRoutes)
-app.use("/api/user", userRoutes)
-app.use("/api/admin", adminRoutes)
-app.use("/api/booking", bookingRoutes)
+app.use("/api/user", generalLimiter, userRoutes)
+app.use("/api/admin", generalLimiter, adminRoutes)
+app.use("/api/booking", generalLimiter, bookingRoutes)
 
 app.get("/health", (req, res) => {
   res.status(200).json({ status: "OK", message: "Server is live" });
