@@ -16,6 +16,19 @@ export const getMyProfile = async(req,res) => {
     } 
 }
 
+export const getTrips = async(req, res) => {
+    try {
+        const busTrips = await Bus.find({}).sort({ departureTime: -1 }).limit(20).lean();
+        const trainTrips = await Train.find({}).sort({ departureTime: -1 }).limit(20).lean();
+
+        return res.status(200).json({ busTrips, trainTrips });
+
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({ message: "Internal server error!" })
+    }
+}
+
 export const searchBus = async(req,res) => {
     try {
         const { origin, destination, date, passengers = 1, page=1, limit=10 } = req.query;
